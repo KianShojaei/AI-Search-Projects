@@ -1,3 +1,5 @@
+# Monte Carlo rollout agent for Ultimate Tic-Tac-Toe.
+# Candidate moves are compared by running randomized continuations from each position.
 import requests
 import time
 import random
@@ -11,6 +13,7 @@ BASE_URL = "https://agent.aiplayground.ir/api"
 OPPONENT = "X" if ROLE == "O" else "O"
 
 
+# Retrieve the current game state from the API.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -22,6 +25,7 @@ def get_session():
         return None
 
 
+# Submit the chosen cell to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -42,6 +46,7 @@ def play_move(row, col):
 
 
 
+# Determine whether a local sub-board has a winner, is drawn, or remains open.
 def check_grid_3x3(grid, br, bc):
 
     for cr in range(3):
@@ -64,6 +69,7 @@ def check_grid_3x3(grid, br, bc):
     return "hidden"
 
 
+# Check whether the completed sub-boards form a winning line.
 def check_macro_winner(macro_grid):
     for r in range(3):
         if macro_grid[r][0] == macro_grid[r][1] == macro_grid[r][2] and macro_grid[r][0] not in ("hidden", "draw"):
@@ -78,6 +84,7 @@ def check_macro_winner(macro_grid):
     return None
 
 
+# List legal cells while respecting the active sub-board constraint.
 def get_valid_moves_local(grid, macro_grid, active_board):
     valid_cells = []
     if active_board is not None:
@@ -100,6 +107,7 @@ def get_valid_moves_local(grid, macro_grid, active_board):
     return valid_cells
 
 
+# Apply one simulated move and calculate the next active sub-board.
 def sim_step(grid, macro_grid, active_board, turn, move):
     r, c = move
     grid[r][c] = turn
@@ -115,6 +123,7 @@ def sim_step(grid, macro_grid, active_board, turn, move):
     return None
 
 
+# Play out a candidate move with random actions and score the final macro-board.
 def playout(grid, macro_grid, active_board, starting_move, turn, player, opponent):
     sim_grid = [row[:] for row in grid]
     sim_macro = [row[:] for row in macro_grid]
@@ -145,10 +154,12 @@ def playout(grid, macro_grid, active_board, starting_move, turn, player, opponen
     return 0
 
 
+# Compare candidates by accumulating the outcomes of repeated randomized playouts.
 def find_best_move_mc(grid, macro_grid, active_board, valid_cells, player, opponent):
     best_score = -float('inf')
     best_move = None
 
+    # Use the same rollout budget for every candidate move.
     sim_count = 30
     for move in valid_cells:
         score = 0
@@ -160,6 +171,7 @@ def find_best_move_mc(grid, macro_grid, active_board, valid_cells, player, oppon
     return best_move
 
 
+# Read the live board, evaluate legal moves, and submit the selected action.
 if __name__ == "__main__":
     print(f"Starting MONTE CARLO Ultimate Tic-Tac-Toe Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
