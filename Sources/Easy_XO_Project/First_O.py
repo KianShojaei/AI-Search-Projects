@@ -1,6 +1,3 @@
-# Minimax-based Tic-Tac-Toe agent. The local board is evaluated recursively before the selected move is submitted to the game API.
-# API credentials and session identifiers are configured below.
-
 import requests
 import time
 import sys
@@ -13,8 +10,7 @@ BASE_URL = "https://agent.aiplayground.ir/api"
 OPPONENT = "X" if ROLE == "X" else "X"
 
 
-# Retrieve the current session state from the game API. A failed request is reported and returns None so the main loop can retry.
-# Retrieve the current game state from the API.
+# Fetch the current game state from the remote session.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -26,8 +22,7 @@ def get_session():
         return None
 
 
-# Submit one action to the game API and return the decoded response when the request succeeds.
-# Submit a move for the configured player.
+# Submit a move using the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -47,8 +42,7 @@ def play_move(row, col):
         return None
 
 
-# Check the board's rows, columns, and diagonals for a completed line.
-# Return the mark that completes a row, column, or diagonal, if one exists.
+# Return the winning mark if any row, column, or diagonal is complete.
 def check_winner(board):
     for r in range(3):
         if board[r][0] == board[r][1] == board[r][2] and board[r][0] != "hidden":
@@ -63,9 +57,7 @@ def check_winner(board):
     return None
 
 
-# Evaluate future Tic-Tac-Toe positions recursively, using terminal scores and alpha-beta bounds to guide the search.
-# Explore future positions recursively and score wins, losses, and draws.
-# Alpha and beta bound the search values considered by the two players.
+# Score future board states recursively, using alpha-beta bounds to prune some branches.
 def minimax(board, depth, is_max, alpha, beta, player, opponent):
     winner = check_winner(board)
     if winner == player:
@@ -77,7 +69,6 @@ def minimax(board, depth, is_max, alpha, beta, player, opponent):
     if not has_moves:
         return 0
 
-    # The maximizing player seeks a higher score; the opponent seeks a lower one.
     if is_max:
         best = -float('inf')
         for r in range(3):
@@ -106,8 +97,7 @@ def minimax(board, depth, is_max, alpha, beta, player, opponent):
         return best
 
 
-# Try each available cell and return the move with the best Minimax score.
-# Evaluate each available move and return the one with the highest search score.
+# Evaluate each available move and keep the one with the highest minimax score.
 def find_best_move(board, player, opponent):
     best_val = -float('inf')
     best_move = None
@@ -123,7 +113,7 @@ def find_best_move(board, player, opponent):
     return best_move
 
 
-# Poll the session and calculate a move when it is this player's turn.
+# Run the agent loop and make a move when the session assigns this player a turn.
 if __name__ == "__main__":
     print(f"Starting MINIMAX Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
