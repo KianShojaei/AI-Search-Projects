@@ -1,5 +1,3 @@
-# Utility-based Firefighter Rescue agent using A* routes and civilian information.
-# Target selection considers reward, path length, and the civilian's remaining health.
 import requests
 import time
 import sys
@@ -10,7 +8,7 @@ SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the current rescue-grid state from the API.
+# Fetch the current rescue-game session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -22,7 +20,7 @@ def get_session():
         return None
 
 
-# Submit one movement action to the game API.
+# Submit the next grid position to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -43,7 +41,7 @@ def play_move(row, col):
 
 
 
-# Find a route using Manhattan distance and the movement costs assigned to grid cells.
+# Find a low-cost path while treating walls and fire as blocked cells.
 def a_star(grid, start, goal):
     R, C = 20, 20
     open_set = []
@@ -71,7 +69,6 @@ def a_star(grid, start, goal):
                 if cell_type in ("wall", "fire"):
                     continue
 
-                # Smoke remains traversable but increases the cost of entering a cell.
                 step_cost = 2.0 if cell_type == "smoke" else 1.0
                 next_g = g + step_cost
                 next_h = abs(nr - goal[0]) + abs(nc - goal[1])
@@ -84,7 +81,7 @@ def a_star(grid, start, goal):
 
 
 
-# Reassess civilian priorities and execute one movement action per turn.
+# Rank reachable civilians by utility, then use a safety fallback when none qualify.
 if __name__ == "__main__":
     print(f"Starting UTILITY-BASED Firefighter Rescue Agent (Session: {SESSION_ID})")
 
@@ -126,7 +123,6 @@ if __name__ == "__main__":
                 if path_len >= health:
                     continue
 
-                # Lower remaining health increases the urgency component of the score.
                 urgency = 100.0 / (health + 1.0)
                 utility = (reward / (path_len + 1.0)) * urgency
 
