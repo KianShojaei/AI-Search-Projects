@@ -1,5 +1,3 @@
-# A* pathfinding agent for Firefighter Rescue.
-# It searches for routes to living civilians and falls back to a nearby safe move if needed.
 import requests
 import time
 import sys
@@ -10,7 +8,7 @@ SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the current rescue-grid state from the API.
+# Fetch the current rescue-game session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -22,7 +20,7 @@ def get_session():
         return None
 
 
-# Submit one movement action to the game API.
+# Submit the next grid position to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -43,7 +41,7 @@ def play_move(row, col):
 
 
 
-# Find a route using Manhattan distance and the movement costs assigned to grid cells.
+# Find a low-cost path while treating walls and fire as blocked cells.
 def a_star(grid, start, goal):
     R, C = 20, 20
     open_set = []
@@ -72,7 +70,6 @@ def a_star(grid, start, goal):
                 if cell_type in ("wall", "fire"):
                     continue
 
-                # Smoke remains traversable but increases the cost of entering a cell.
                 step_cost = 2.0 if cell_type == "smoke" else 1.0
                 next_g = g + step_cost
                 next_h = abs(nr - goal[0]) + abs(nc - goal[1])
@@ -85,7 +82,7 @@ def a_star(grid, start, goal):
 
 
 
-# Reassess the board each turn, select a target, and execute the next step.
+# Select the nearest reachable civilian, then use a safe-neighbor fallback if needed.
 if __name__ == "__main__":
     print(f"Starting Firefighter Rescue Agent (Session: {SESSION_ID})")
 
