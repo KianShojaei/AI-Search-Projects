@@ -1,3 +1,6 @@
+# Random Tic-Tac-Toe agent. The agent polls the game session and chooses uniformly from the currently hidden cells when it is its turn.
+# API credentials and session identifiers are configured below.
+
 import requests
 import time
 import random
@@ -9,6 +12,7 @@ ROLE = "X"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
+# Retrieve the current session state from the game API. A failed request is reported and returns None so the main loop can retry.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -20,6 +24,7 @@ def get_session():
         return None
 
 
+# Submit one action to the game API and return the decoded response when the request succeeds.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -67,6 +72,7 @@ if __name__ == "__main__":
                         empty_cells.append((r, c))
 
             if empty_cells:
+                # No strategic scoring is applied: every available cell has equal selection chance.
                 target = random.choice(empty_cells)
                 print(f"Placing RANDOM mark {ROLE} at {target}")
                 play_move(target[0], target[1])
