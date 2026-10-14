@@ -2,8 +2,8 @@ import requests
 import time
 import sys
 
-API_KEY = "minesweeper_3918d2f61f5e490a811922b50006712f"
-SESSION_ID = "47832654-218d-4339-b6bc-c1c87b0e111c"
+API_KEY = "Add Your API Key"
+SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
