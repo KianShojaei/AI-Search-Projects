@@ -2,8 +2,8 @@ import requests
 import time
 import sys
 
-API_KEY = "sudoku_5a0f0e46385541d19c76cdb6df16c1be"
-SESSION_ID = "5b21c8f2-f2a3-47c9-9f4e-a634cd37c4c1"
+API_KEY = "Add Your API Key"
+SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
