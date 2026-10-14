@@ -1,3 +1,4 @@
+# Search-based Othello agent using Minimax and a positional evaluation function.
 import requests
 import time
 import sys
@@ -21,6 +22,7 @@ WEIGHTS = [
 ]
 
 
+# Retrieve the current board and turn information.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -32,6 +34,7 @@ def get_session():
         return None
 
 
+# Submit a selected move to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -52,6 +55,7 @@ def play_move(row, col):
 
 
 
+# Apply a legal move and flip the opponent's captured pieces.
 def execute_move(board, row, col, color):
     new_board = [r[:] for r in board]
     new_board[row][col] = color
@@ -74,6 +78,7 @@ def execute_move(board, row, col, color):
     return new_board
 
 
+# Enumerate moves that capture at least one opposing piece under Othello rules.
 def get_valid_moves(board, color):
     opponent = "W" if color == "B" else "B"
     valid = []
@@ -113,6 +118,7 @@ def evaluate_board(board, player, opponent):
     return score
 
 
+# Search the game tree to the configured depth, alternating maximizing and minimizing turns.
 def minimax(board, depth, is_max, alpha, beta, player, opponent):
     if depth == 0:
         return evaluate_board(board, player, opponent)
@@ -162,6 +168,7 @@ def find_best_move(board, valid_moves, player, opponent):
     return best_move
 
 
+# Select a move from the live position and handle turns reported by the API.
 if __name__ == "__main__":
     print(f"Starting MINIMAX Othello Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
