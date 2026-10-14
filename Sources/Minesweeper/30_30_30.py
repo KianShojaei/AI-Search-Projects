@@ -1,5 +1,3 @@
-# Minesweeper agent for the 30 × 30 board configuration.
-# It combines deductions from neighboring clues with a risk-based fallback.
 import requests
 import time
 import sys
@@ -9,7 +7,7 @@ SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the latest board and game status from the API.
+# Fetch the current Minesweeper session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -42,6 +40,7 @@ def play_move(action, row, col):
 
 
 
+# Build local number constraints and identify cells proven safe or mined.
 def deduce_moves(grid, R, C):
     equations = []
 
@@ -105,6 +104,7 @@ def deduce_moves(grid, R, C):
     return known_safe, known_mines
 
 
+# Estimate risk from adjacent clues when deterministic deductions stall.
 def get_safest_guess(grid, R, C):
     cell_risks = {}
     for r in range(R):
@@ -148,7 +148,7 @@ def get_safest_guess(grid, R, C):
 
 
 
-# Repeatedly inspect the board and act while the session remains active.
+# Repeatedly apply deductions, falling back to the lowest estimated-risk cell.
 if __name__ == "__main__":
     print(f"Starting Logical Minesweeper Agent (Session: {SESSION_ID})")
 
