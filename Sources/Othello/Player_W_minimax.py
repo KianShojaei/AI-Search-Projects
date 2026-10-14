@@ -2,8 +2,8 @@ import requests
 import time
 import sys
 
-API_KEY = "othello_W_356eba6b0fc94082a9ee77e223d3b2d7"
-SESSION_ID = "cd14c732-606c-41ff-9b88-9f529298c4c3"
+API_KEY = "Add Your API Key"
+SESSION_ID = "Add Your Session ID"
 ROLE = "W"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
