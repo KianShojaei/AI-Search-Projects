@@ -1,6 +1,6 @@
 # AI Search Projects
 
-A set of small Python agents built to explore how different AI search and decision-making techniques behave in interactive problems. The projects cover board games, constraint-based puzzles, hidden-information reasoning, and pathfinding in a rescue scenario.
+A collection of Python projects developed for an Artificial Intelligence course, exploring search algorithms, constraint satisfaction, game-playing strategies, and pathfinding through small interactive agents. The projects cover board games, constraint-based puzzles, hidden-information reasoning, and a rescue scenario.
 
 Rather than presenting one large framework, this repository keeps each agent as a separate, readable experiment. That makes it easier to inspect a strategy in context and compare different approaches without hiding them behind a shared abstraction.
 
