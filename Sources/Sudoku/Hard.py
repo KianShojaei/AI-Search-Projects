@@ -1,4 +1,3 @@
-# Sudoku agent using constraint satisfaction, backtracking, and MRV cell selection.
 import requests
 import time
 import sys
@@ -8,7 +7,7 @@ SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the current puzzle state from the game API.
+# Fetch the current Sudoku session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -20,7 +19,7 @@ def get_session():
         return None
 
 
-# Submit a value for a selected cell.
+# Submit a value for a selected cell through the game API.
 def play_move(row, col, value):
     headers = {
         "X-API-Key": API_KEY,
@@ -41,7 +40,7 @@ def play_move(row, col, value):
         return None
 
 
-# Check the row, column, and containing 3 × 3 box for conflicts.
+# Check row, column, and 3x3-box constraints before placing a value.
 def is_valid(board, row, col, val):
     for c in range(9):
         if board[row][c] == val:
@@ -51,7 +50,6 @@ def is_valid(board, row, col, val):
         if board[r][col] == val:
             return False
 
-    # Find the top-left coordinates of the cell's 3 × 3 subgrid.
     start_row, start_col = 3 * (row // 3), 3 * (col // 3)
     for r in range(start_row, start_row + 3):
         for c in range(start_col, start_col + 3):
@@ -61,7 +59,7 @@ def is_valid(board, row, col, val):
     return True
 
 
-# Select an empty cell with the fewest legal candidate values.
+# Select an empty cell with the fewest currently legal values (MRV heuristic).
 def get_mrv_cell(board):
     min_remaining = 10
     best_cell = None
@@ -81,9 +79,8 @@ def get_mrv_cell(board):
     return best_cell
 
 
-# Solve the puzzle recursively, undoing assignments when a branch fails.
+# Solve the board with recursive constraint-satisfaction backtracking.
 def solve_csp(board):
-    # Branch on the most constrained unfilled cell first.
     cell = get_mrv_cell(board)
     if not cell:
         return True
@@ -101,7 +98,7 @@ def solve_csp(board):
 
 
 
-# Read the live puzzle, solve a local copy, and submit the missing values.
+# Solve the received puzzle locally, then submit its empty cells one at a time.
 if __name__ == "__main__":
     print(f"Starting CSP-Sudoku agent for Session: {SESSION_ID}")
 
