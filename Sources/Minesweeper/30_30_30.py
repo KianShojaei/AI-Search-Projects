@@ -1,3 +1,5 @@
+# Minesweeper agent for the 30 × 30 board configuration.
+# It combines deductions from neighboring clues with a risk-based fallback.
 import requests
 import time
 import sys
@@ -7,6 +9,7 @@ SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
+# Retrieve the latest board and game status from the API.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -18,6 +21,7 @@ def get_session():
         return None
 
 
+# Send a reveal or flag action to the game API.
 def play_move(action, row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -144,6 +148,7 @@ def get_safest_guess(grid, R, C):
 
 
 
+# Repeatedly inspect the board and act while the session remains active.
 if __name__ == "__main__":
     print(f"Starting Logical Minesweeper Agent (Session: {SESSION_ID})")
 
