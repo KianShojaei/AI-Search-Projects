@@ -1,3 +1,5 @@
+# Random-move agent for Ultimate Tic-Tac-Toe.
+# Candidate cells are constrained by the active sub-board when the rules require one.
 import requests
 import time
 import random
@@ -9,6 +11,7 @@ ROLE = "X"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
+# Retrieve the current Ultimate Tic-Tac-Toe session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -20,6 +23,7 @@ def get_session():
         return None
 
 
+# Submit a selected cell to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -39,6 +43,7 @@ def play_move(row, col):
         return None
 
 
+# Poll the session and act only when the configured player has the turn.
 if __name__ == "__main__":
     print(f"Starting RANDOM Ultimate Tic-Tac-Toe agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
@@ -63,6 +68,7 @@ if __name__ == "__main__":
             macro_grid = state["macro_grid"]
             active_board = state["active_board"]
 
+            # Build the legal candidate list for the current active-board state.
             valid_cells = []
 
 
