@@ -1,6 +1,3 @@
-# Random Tic-Tac-Toe agent. The agent polls the game session and chooses uniformly from the currently hidden cells when it is its turn.
-# API credentials and session identifiers are configured below.
-
 import requests
 import time
 import random
@@ -12,8 +9,7 @@ ROLE = "X"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the current session state from the game API. A failed request is reported and returns None so the main loop can retry.
-# Retrieve the current game state; report request failures so the loop can retry.
+# Fetch the current game state from the remote session.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -25,8 +21,7 @@ def get_session():
         return None
 
 
-# Submit one action to the game API and return the decoded response when the request succeeds.
-# Submit the selected cell to the game API.
+# Submit a move using the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -46,7 +41,7 @@ def play_move(row, col):
         return None
 
 
-# Poll the session and act only when it is this agent's turn.
+# Poll the session and choose a random empty cell whenever it is this agent's turn.
 if __name__ == "__main__":
     print(f"Starting RANDOM Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
@@ -68,7 +63,6 @@ if __name__ == "__main__":
 
         if state["turn"] == ROLE:
             grid = state["grid"]
-            # Collect cells that have not been played yet.
             empty_cells = []
             for r in range(3):
                 for c in range(3):
@@ -76,8 +70,6 @@ if __name__ == "__main__":
                         empty_cells.append((r, c))
 
             if empty_cells:
-                # No strategic scoring is applied: every available cell has equal selection chance.
-                # This baseline gives every available cell an equal chance of selection.
                 target = random.choice(empty_cells)
                 print(f"Placing RANDOM mark {ROLE} at {target}")
                 play_move(target[0], target[1])
