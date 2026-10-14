@@ -1,19 +1,58 @@
 # AI Search Projects
 
-A collection of Python agents exploring search, constraint satisfaction, game-playing, and pathfinding. Each script is a separate agent intended to interact with a compatible remote game API.
+A set of small Python agents built to explore how different AI search and decision-making techniques behave in interactive problems. The projects cover board games, constraint-based puzzles, hidden-information reasoning, and pathfinding in a rescue scenario.
 
-## Project Overview
+Rather than presenting one large framework, this repository keeps each agent as a separate, readable experiment. That makes it easier to inspect a strategy in context and compare different approaches without hiding them behind a shared abstraction.
 
-| Project | Agents | Main approach |
+## At a glance
+
+| Project | Agents | Main ideas |
 |---|---|---|
-| Easy Tic-Tac-Toe | `First_X.py`, `First_O.py` | Random play and Minimax search |
-| Sudoku | `Easy.py`, `Medium.py`, `Hard.py` | Constraint satisfaction, backtracking, and the Minimum Remaining Values (MRV) heuristic |
-| Minesweeper | `10_10_10.py`, `30_30_30.py` | Local constraint deduction with a risk-based fallback |
-| Othello | `Player_B_Random.py`, `Player_W_minimax.py` | Random legal moves and depth-limited Minimax with positional weights |
-| Ultimate Tic-Tac-Toe | `FirstX_random.py`, `FirstO_montecarlo.py` | Random legal moves and Monte Carlo-style random playout evaluation |
-| Firefighter Rescue | `First.py`, `Second.py` | A* pathfinding with different target-selection strategies |
+| Easy Tic-Tac-Toe | `First_X.py`, `First_O.py` | Random action selection and Minimax |
+| Sudoku | `Easy.py`, `Medium.py`, `Hard.py` | Constraint satisfaction, backtracking, and Minimum Remaining Values (MRV) |
+| Minesweeper | `10_10_10.py`, `30_30_30.py` | Local constraint deduction and risk-based fallback choices |
+| Othello | `Player_B_Random.py`, `Player_W_minimax.py` | Random legal moves and depth-limited Minimax with positional evaluation |
+| Ultimate Tic-Tac-Toe | `FirstX_random.py`, `FirstO_montecarlo.py` | Legal random moves and Monte Carlo-style random rollouts |
+| Firefighter Rescue | `First.py`, `Second.py` | A* pathfinding and alternative target-selection strategies |
 
-## Repository Structure
+## What I wanted to explore
+
+These projects look at a few complementary questions:
+
+- **Search and planning:** How can an agent choose an action by looking ahead or finding a low-cost path?
+- **Constraints and inference:** How can an agent use the information already available to narrow down valid choices?
+- **Decision-making under uncertainty:** What can an agent do when its deductions do not determine a single safe move?
+- **Evaluation and trade-offs:** How do simple baselines compare with strategies that spend more effort evaluating possible outcomes?
+
+The implementations are intentionally kept as individual scripts. The goal is to make each approach inspectable, rather than to suggest that every agent uses the same architecture or has the same level of sophistication.
+
+## How the agents work
+
+### Tic-Tac-Toe
+
+The two agents provide a straightforward contrast: one selects an available move at random, while the Minimax agent evaluates possible game states recursively. This offers a compact example of the difference between choosing a legal action and choosing one based on future outcomes.
+
+### Sudoku
+
+The Sudoku agents represent the puzzle as a constraint-satisfaction problem. They check candidate values against the board, use recursive backtracking to explore assignments, and apply the Minimum Remaining Values (MRV) heuristic to prioritize cells with fewer available candidates. The `Easy.py`, `Medium.py`, and `Hard.py` files are retained as separate difficulty/session entry points.
+
+### Minesweeper
+
+These agents use the numbers revealed around a cell to derive local constraints and identify moves that can be inferred from the current board. When the available deductions do not settle the next move, they fall back to a risk-based choice. The two scripts remain separate entry points for their respective board/session settings.
+
+### Othello
+
+The random agent chooses from the legal moves provided by the game service. The other agent uses a positional-weight matrix to evaluate board states and applies depth-limited Minimax with alpha-beta pruning. Together, they offer a useful contrast between a simple baseline and a search-based strategy.
+
+### Ultimate Tic-Tac-Toe
+
+The random agent selects a legal move while respecting the active small-board rule. The second agent evaluates candidate moves through repeated random playouts. This is a rollout-based Monte Carlo evaluation approach; it should not be confused with a full Monte Carlo Tree Search (MCTS) implementation.
+
+### Firefighter Rescue
+
+Both agents use A* to plan routes through a grid, avoiding walls and fire while assigning a higher movement cost to smoke. They differ in how they choose whom to rescue: one prioritizes the nearest reachable civilian, while the other uses a utility score that considers reward, route length, and urgency.
+
+## Repository layout
 
 ```text
 AI-Search-Projects/
@@ -37,36 +76,22 @@ AI-Search-Projects/
 │   └── Firefighter_Rescue/
 │       ├── First.py
 │       └── Second.py
+├── .github/
+│   └── workflows/
+│       └── python-check.yml
 ├── requirements.txt
 ├── LICENSE
 └── README.md
 ```
 
-## How the Agents Work
+## Getting started
 
-### Tic-Tac-Toe
-The random agent selects an available cell at random. The Minimax agent recursively evaluates possible game states to choose a move.
-
-### Sudoku
-The Sudoku agents construct a board from the session state and solve it using constraint checks, recursive backtracking, and the MRV heuristic before submitting values through the API. The three filenames represent separate difficulty/session variants; they are kept as distinct entry points.
-
-### Minesweeper
-The agents derive constraints from revealed numbered cells to identify safe cells or likely mines. When deductions do not determine a move, they use estimated risk to choose a fallback cell. The two filenames are retained as separate entry points for different board/session settings.
-
-### Othello
-One agent chooses randomly from server-provided legal moves. The other evaluates positions using a positional-weight matrix and depth-limited Minimax with alpha-beta pruning.
-
-### Ultimate Tic-Tac-Toe
-The random agent chooses a legal cell while respecting the active small-board rule. The second agent evaluates candidate moves using repeated random playouts. This is a rollout-based Monte Carlo evaluation approach, not a full Monte Carlo Tree Search implementation.
-
-### Firefighter Rescue
-Both agents use A* to find paths while avoiding walls and fire and assigning a higher movement cost to smoke. One prioritizes the nearest reachable civilian; the other ranks targets using a utility score that accounts for reward, path length, and urgency.
-
-## Requirements
+### Requirements
 
 - Python 3
-- A compatible game API endpoint and a valid session
-- The Python dependency listed in `requirements.txt`
+- Access to a compatible game API
+- A valid session for the game you want to run
+- The dependency listed in `requirements.txt`
 
 Install the dependency from the repository root:
 
@@ -74,27 +99,27 @@ Install the dependency from the repository root:
 python -m pip install -r requirements.txt
 ```
 
-## Configuration
+### Configure an agent
 
-The scripts currently use `API_KEY` and `SESSION_ID` configuration values in their source files. The public versions contain placeholders rather than working credentials.
+The scripts use `API_KEY` and `SESSION_ID` configuration values. The public repository is intended to contain placeholders, not active credentials.
 
-Before running an agent, make a local copy or edit your local working tree and replace the placeholders with credentials for your own compatible API session. **Do not commit real keys, session IDs, access tokens, or other secrets.** Keep personal credentials out of screenshots and logs as well.
+Before running a script, update the configuration in your local working copy with credentials for a compatible API session. Keep real API keys, session IDs, and access tokens out of commits, screenshots, and logs.
 
-## Running an Agent
+### Run an example
 
-Run a script from the repository root. For example:
+From the repository root, run:
 
 ```bash
 python Sources/Easy_XO_Project/First_X.py
 ```
 
-Choose the script that matches the game, player role, and session configuration. Each agent communicates with the remote API and submits actions when it is that agent's turn. A valid API key alone is not sufficient if the session, endpoint, or expected response format differs from the one the script was written for.
+Choose the script that matches your game, player role, and session. Each agent communicates with the remote service and submits an action when appropriate. A valid key by itself does not guarantee a successful run: the endpoint, session state, and API response format must also match what the script expects.
 
-## Validation and Scope
+## Validation and limitations
 
-The source files are independent experiments rather than one unified application. Their comments and this README document the existing implementations; they do not imply that the algorithms have been redesigned.
+A GitHub Actions workflow runs a Python syntax check on pushes and pull requests. This helps catch syntax errors, but it does **not** verify game strategy, contact the remote API, or guarantee that an external session is available.
 
-The repository's automated check validates Python syntax. It does not call the game API or prove that a remote session is available. End-to-end behavior depends on the compatible service and session credentials.
+The scripts are separate implementations, not a unified package. This README describes the approaches present in the code; it does not claim that the algorithms have been rebuilt or benchmarked under a common evaluation setup. End-to-end results depend on the compatible service and session configuration.
 
 ## License
 
