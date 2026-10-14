@@ -14,6 +14,7 @@ OPPONENT = "X" if ROLE == "X" else "X"
 
 
 # Retrieve the current session state from the game API. A failed request is reported and returns None so the main loop can retry.
+# Retrieve the current game state from the API.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -26,6 +27,7 @@ def get_session():
 
 
 # Submit one action to the game API and return the decoded response when the request succeeds.
+# Submit a move for the configured player.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -46,6 +48,7 @@ def play_move(row, col):
 
 
 # Check the board's rows, columns, and diagonals for a completed line.
+# Return the mark that completes a row, column, or diagonal, if one exists.
 def check_winner(board):
     for r in range(3):
         if board[r][0] == board[r][1] == board[r][2] and board[r][0] != "hidden":
@@ -61,6 +64,8 @@ def check_winner(board):
 
 
 # Evaluate future Tic-Tac-Toe positions recursively, using terminal scores and alpha-beta bounds to guide the search.
+# Explore future positions recursively and score wins, losses, and draws.
+# Alpha and beta bound the search values considered by the two players.
 def minimax(board, depth, is_max, alpha, beta, player, opponent):
     winner = check_winner(board)
     if winner == player:
@@ -102,6 +107,7 @@ def minimax(board, depth, is_max, alpha, beta, player, opponent):
 
 
 # Try each available cell and return the move with the best Minimax score.
+# Evaluate each available move and return the one with the highest search score.
 def find_best_move(board, player, opponent):
     best_val = -float('inf')
     best_move = None
@@ -117,6 +123,7 @@ def find_best_move(board, player, opponent):
     return best_move
 
 
+# Poll the session and calculate a move when it is this player's turn.
 if __name__ == "__main__":
     print(f"Starting MINIMAX Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
