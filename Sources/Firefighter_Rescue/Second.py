@@ -3,8 +3,8 @@ import time
 import sys
 import heapq
 
-API_KEY = "firefighter_9146003df642407ab521527ed4aa0c28"
-SESSION_ID = "95e69581-be01-4eae-86b2-73ba19bb9375"
+API_KEY = "Add Your API Key"
+SESSION_ID = "Add Your Session ID"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
