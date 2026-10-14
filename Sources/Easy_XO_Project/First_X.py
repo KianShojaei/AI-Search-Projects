@@ -3,8 +3,8 @@ import time
 import random
 import sys
 
-API_KEY = "tictactoe_X_7f865bd0ccfe4e27b9cc58946056de43"
-SESSION_ID = "c5438c1c-0500-4beb-bc28-0edb3f2f0649"
+API_KEY = "Add Your API Key"
+SESSION_ID = "Add Your Session ID"
 ROLE = "X"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
