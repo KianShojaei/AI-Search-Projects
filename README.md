@@ -1,62 +1,60 @@
 # AI Search Projects
 
-## Overview
+A collection of Python agents exploring search, constraint satisfaction, game-playing, and pathfinding. The agents interact with a remote game API and use different decision-making strategies depending on the environment.
 
-This repository brings together a set of small, self-contained agents for classic search, constraint-solving, and game-playing tasks. The projects explore how different problem structures call for different decision-making strategies—from random legal actions to recursive search, local constraint reasoning, and heuristic pathfinding.
+## Project Overview
 
-The implementations were developed and tested as working agents against the associated game API. The source files are kept separate by environment so that each approach can be read and considered in its own context.
-
-## Project Map
-
-| Project | Files | Main approach |
+| Project | Source files | Main approach |
 |---|---|---|
-| Tic-Tac-Toe | `Sources/Easy_XO_Project/First_X.py`, `First_O.py` | Random legal move selection and Minimax with alpha-beta bounds |
-| Sudoku | `Sources/Sudoku/Easy.py`, `Medium.py`, `Hard.py` | Constraint satisfaction, recursive backtracking, and Minimum Remaining Values (MRV) |
-| Minesweeper | `Sources/Minesweeper/10_10_10.py`, `30_30_30.py` | Local constraint deductions with a risk-based fallback |
-| Othello | `Sources/Othello/Player_B_Random.py`, `Player_W_minimax.py` | Random legal moves and depth-limited Minimax with positional evaluation |
-| Ultimate Tic-Tac-Toe | `Sources/Hard_XO_Project/FirstX_random.py`, `FirstO_montecarlo.py` | Random legal moves and Monte Carlo rollout evaluation |
-| Firefighter Rescue | `Sources/Firefighter_Rescue/First.py`, `Second.py` | A* pathfinding and target selection, including a utility-based variant |
+| Easy Tic-Tac-Toe | `Sources/Easy_XO_Project/First_X.py`, `First_O.py` | Random play and Minimax search |
+| Sudoku | `Sources/Sudoku/Easy.py`, `Medium.py`, `Hard.py` | Constraint satisfaction, backtracking, and the Minimum Remaining Values (MRV) heuristic |
+| Minesweeper | `Sources/Minesweeper/10_10_10.py`, `30_30_30.py` | Local constraint deduction with a risk-based fallback |
+| Othello | `Sources/Othello/Player_B_Random.py`, `Player_W_minimax.py` | Random legal moves and depth-limited Minimax with positional weights |
+| Ultimate Tic-Tac-Toe | `Sources/Hard_XO_Project/FirstX_random.py`, `FirstO_montecarlo.py` | Random legal moves and Monte Carlo-style random playout evaluation |
+| Firefighter Rescue | `Sources/Firefighter_Rescue/First.py`, `Second.py` | A* pathfinding, with nearest-target selection or utility-based target selection |
 
 ## Repository Structure
 
 ```text
-Sources/
-├── Easy_XO_Project/
-├── Sudoku/
-├── Minesweeper/
-├── Othello/
-├── Hard_XO_Project/
-└── Firefighter_Rescue/
+AI-Search-Projects/
+├── Sources/
+│   ├── Easy_XO_Project/
+│   ├── Sudoku/
+│   ├── Minesweeper/
+│   ├── Othello/
+│   ├── Hard_XO_Project/
+│   └── Firefighter_Rescue/
+└── README.md
 ```
 
-Each directory groups the agent implementations for one environment. File names identify the variant or player strategy.
+## How the Agents Work
 
-## Approaches at a Glance
+### Tic-Tac-Toe
+- The random agent selects an empty cell at random.
+- The Minimax agent evaluates candidate moves by recursively exploring possible game states.
 
-### Game-playing agents
+### Sudoku
+The Sudoku agents build a local board from the session state and solve it using constraint checks, recursive backtracking, and the MRV heuristic. They then submit values for the remaining cells through the API.
 
-The Tic-Tac-Toe and Othello projects contrast a simple randomized baseline with search-based decision making. The Minimax agents evaluate possible future states; where implemented, alpha-beta bounds can prune parts of the search tree without changing the Minimax decision. The Othello search also uses a positional evaluation to distinguish board locations.
+### Minesweeper
+The agents derive constraints from revealed numbered cells and use those constraints to identify safe cells or likely mines. If the available deductions do not determine a move, they estimate relative risk to select a fallback cell.
 
-Ultimate Tic-Tac-Toe adds a larger state space and the constraint that a move can determine the next sub-board. Its Monte Carlo agent compares candidate moves using repeated randomized playouts. This is rollout-based evaluation rather than a full Monte Carlo Tree Search implementation.
+### Othello
+One agent chooses randomly from the server-provided legal moves. The other evaluates board positions using a positional-weight matrix and searches ahead with depth-limited Minimax and alpha-beta pruning.
 
-### Constraint solving
+### Ultimate Tic-Tac-Toe
+The random agent chooses among legal cells while respecting the active small-board rule. The second agent evaluates candidate moves through repeated random playouts. This is a rollout-based Monte Carlo evaluation approach; it is not a full Monte Carlo Tree Search implementation.
 
-The Sudoku agents treat each empty cell as a variable whose values are restricted by its row, column, and 3 × 3 box. Backtracking explores legal assignments, while the MRV heuristic selects an unfilled cell with the fewest legal values to reduce unnecessary branching.
-
-The Minesweeper agents reason from the numbered clues around each revealed cell. When local constraints do not force a move, they use a risk-based estimate to choose a fallback action.
-
-### Pathfinding and rescue planning
-
-The Firefighter Rescue agents use A* over a grid with four-directional movement. Walls and fire are treated as blocked cells, while smoke has a higher movement cost. The second variant additionally considers civilian reward and health when ranking reachable targets.
+### Firefighter Rescue
+Both agents use A* to find paths while avoiding walls and fire and assigning a higher movement cost to smoke. One prioritizes the nearest reachable civilian; the other ranks reachable civilians with a utility score that accounts for reward, path length, and urgency.
 
 ## Requirements
 
 - Python 3
-- The `requests` package
-- Access to the associated game API
-- A valid API key and session identifier for the target environment
+- `requests` package
+- Access to the compatible game API and a valid session
 
-Install the Python dependency with:
+Install the Python dependency:
 
 ```bash
 python -m pip install requests
@@ -64,26 +62,26 @@ python -m pip install requests
 
 ## Configuration
 
-The source files use `API_KEY`, `SESSION_ID`, and `BASE_URL` configuration values to communicate with the game service. The repository's credential placeholders are intentional: replace them locally with credentials issued for your own session before running an agent. Do not commit real API keys or private session identifiers to a public repository.
+The source files use two configuration values:
 
-Different files may require different credentials or sessions depending on the environment and player role. Check the configuration block near the top of the selected file before launching it.
+- `API_KEY`: your API access key
+- `SESSION_ID`: the game session identifier
+
+For safety, the repository versions use placeholders instead of real credentials. Set these values locally before running an agent. Do not commit real API keys, session identifiers, or other secrets to a public repository.
 
 ## Running an Agent
 
-Run a script from the repository root using Python. For example:
+Run the desired script from the repository root. For example:
 
 ```bash
 python Sources/Easy_XO_Project/First_X.py
 ```
 
-Choose the script that matches the environment and role you want to run. The agents poll the current session, act when it is their turn (where applicable), and stop when the API reports that the game has ended. Keep the process running while the agent is participating in a live session.
+Choose a script that matches the game and role configured for your session. Each agent polls its session and submits actions when it is that agent's turn.
 
-## Reading the Code
+## Scope and Notes
 
-The comments are intended to explain the purpose of a function or a non-obvious algorithmic step, rather than restate every line. The implementations are intentionally presented as separate scripts so that the logic for each environment can be inspected without first navigating a larger framework.
-
-## Scope and Reproducibility
-
-These scripts are API-connected agents, not a standalone game simulator. Reproducing a run depends on the availability of the game service, a compatible session, and valid credentials. Results may also depend on the environment's initial state and, for randomized agents, the random choices made during a run.
-
-The code documents the strategies used by these implementations; it does not claim that one strategy is universally optimal across all environments or configurations.
+- The repository is a set of separate agents and experiments, not a single application.
+- The scripts expect the response structure and endpoints of the compatible game API.
+- The agents use different approaches so their behavior can be explored and compared.
+- Comments in the source files explain the intent of key functions and decision-making steps. The documentation changes are intended to clarify the existing implementations, not redesign their algorithms.
