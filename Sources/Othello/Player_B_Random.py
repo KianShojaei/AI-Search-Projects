@@ -1,5 +1,3 @@
-# Random-move baseline for Othello.
-# Legal-move generation is used to keep the selected action within the rules.
 import requests
 import time
 import random
@@ -11,7 +9,7 @@ ROLE = "B"
 BASE_URL = "https://agent.aiplayground.ir/api"
 
 
-# Retrieve the current Othello board and turn information.
+# Fetch the current Othello session state.
 def get_session():
     try:
         res = requests.get(f"{BASE_URL}/sessions/{SESSION_ID}/")
@@ -23,7 +21,7 @@ def get_session():
         return None
 
 
-# Submit a legal move for the configured player.
+# Submit a board position to the game API.
 def play_move(row, col):
     headers = {
         "X-API-Key": API_KEY,
@@ -43,7 +41,7 @@ def play_move(row, col):
         return None
 
 
-# Poll the game state and choose a move when this player is active.
+# Choose randomly from the valid moves whenever this agent has the turn.
 if __name__ == "__main__":
     print(f"Starting RANDOM Othello Agent for Player {ROLE} (Session: {SESSION_ID})")
     while True:
